@@ -1,0 +1,28 @@
+[package]
+name = "petals_solana_native"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "petals_solana_native"
+crate-type = ["cdylib", "rlib"]
+
+[features]
+no-entrypoint = []
+
+[dependencies]
+solana-program = { version = "2.1.4", feature = "borsh" }
+solana-sdk = "2.1.4"
+solana-program-test = "2.1.4"
+
+spl-token = { version = "7.0.0", features = ["no-entrypoint"] }
+# spl_token_2022 = "6.0.0"
+
+tokio = "1.42.0"
+
+borsh = { version = "1.5.3", feature = "derive" }
+thiserror = "2.0.4"
+num-derive = "0.4.2"
+num-traits = "0.2.19"
+num_enum = "0.7.3"
+

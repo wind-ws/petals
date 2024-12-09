@@ -165,7 +165,72 @@ pub fn ins_create_token_account(
             payer_account.clone(),
             token_program.clone(),
         ],
-        &[&[MintRmb::SEED, &[bump]]]
+        &[&[MintRmb::SEED, &[bump]]],
+    )?;
+    msg!("Tokens minted to wallet successfully.");
+
+    Ok(())
+}
+
+#[derive(BorshSerialize, BorshDeserialize, Debug)]
+pub struct InsAirDrop {
+    pub airdrop: u16,
+}
+
+/// plan : 也许应该设置一个 一天只能空投一次 的限制
+pub fn ins_air_drop(
+    program_id: &Pubkey,
+    accounts: &[AccountInfo],
+    args: InsAirDrop,
+) -> ProgramResult {
+    let accounts_iter = &mut accounts.iter();
+
+    let payer_account = next_account_info(accounts_iter)?;
+    let mint_rmb_account = next_account_info(accounts_iter)?;
+    let owner_rmb_account = next_account_info(accounts_iter)?;
+    let token_rmb_account = next_account_info(accounts_iter)?;
+    // let system_program = next_account_info(accounts_iter)?;
+    let token_program = next_account_info(accounts_iter)?;
+    // let associated_token_program = next_account_info(accounts_iter)?;
+
+    let (mint_rmb, bump) = MintRmb::pda(program_id);
+    let (token_rmb, token_bump) =
+        MintRmb::token_account(program_id, owner_rmb_account.key, &mint_rmb);
+    assert!(&mint_rmb.eq(mint_rmb_account.key));
+    assert!(&token_rmb.eq(token_rmb_account.key));
+    // assert!(system_program::check_id(system_program.key));
+    assert!(spl_token::check_id(token_program.key));
+    // assert!(spl_associated_token_account::check_id(
+    //     associated_token_program.key
+    // ));
+
+    if token_rmb_account.lamports() == 0 {
+        return Err(MyError::TokenRmbNonExist.into());
+    }
+    if args.airdrop == 0 {
+        return Ok(());
+    }
+
+    msg!(
+        "Minting {} tokens to associated token account...",
+        args.airdrop
+    );
+    invoke_signed(
+        &spl_token::instruction::mint_to(
+            token_program.key,
+            mint_rmb_account.key,
+            &token_rmb_account.key,
+            mint_rmb_account.key,
+            &[],
+            args.airdrop as u64,
+        )?,
+        &[
+            mint_rmb_account.clone(),
+            token_rmb_account.clone(),
+            payer_account.clone(),
+            token_program.clone(),
+        ],
+        &[&[MintRmb::SEED, &[bump]]],
     )?;
     msg!("Tokens minted to wallet successfully.");
 

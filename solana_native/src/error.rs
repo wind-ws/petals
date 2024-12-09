@@ -13,6 +13,8 @@ pub enum MyError {
     MintRmbExist,
     #[error("Token Account Exist")]
     TokenRmbExist,
+    #[error("Token Account Non-Exist")]
+    TokenRmbNonExist,
 }
 
 impl From<MyError> for ProgramError {

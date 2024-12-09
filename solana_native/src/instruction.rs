@@ -1,7 +1,7 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 
 use crate::instructions::{
-    InsCreateTokenAccount, InsInitMintRmb, InsPublishRaiseFund,
+    InsAirDrop, InsCreateTokenAccount, InsInitMintRmb, InsPublishRaiseFund
 };
 
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
@@ -37,4 +37,9 @@ pub enum Instruction {
     /// .`[]` token_program \
     /// .`[]` associated_token_program \
     CreateTokenAccount(InsCreateTokenAccount),
+    /// 对 token_account 投放空投
+    /// 
+    /// # accounts
+    /// 
+    AirDrop(InsAirDrop)
 }

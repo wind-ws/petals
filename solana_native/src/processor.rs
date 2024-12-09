@@ -27,6 +27,10 @@ impl Processor {
                 msg!("Ins: CreateTokenAccount");
                 ins_create_token_account(program_id,accounts,args)
             }
+            Instruction::AirDrop(args)=>{
+                msg!("Ins: AirDrop");
+                ins_air_drop(program_id, accounts, args)
+            }
             Instruction::None => {
                 msg!("none!!!");
                 Ok(())

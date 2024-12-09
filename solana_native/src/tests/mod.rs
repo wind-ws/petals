@@ -3,6 +3,8 @@ use solana_sdk::{
     address_lookup_table::instruction,
     feature_set::rent_for_sysvars,
     instruction::AccountMeta,
+    msg, native_token,
+    program_pack::Pack,
     pubkey::Pubkey,
     signature::Signer,
     system_program, sysvar,
@@ -12,7 +14,7 @@ use solana_sdk::{
 use crate::{
     entrypoint::process_instruction,
     instruction::Instruction,
-    instructions::{InsCreateTokenAccount, InsInitMintRmb},
+    instructions::{InsAirDrop, InsCreateTokenAccount, InsInitMintRmb},
     state::mint_rmb::{self, MintRmb},
 };
 
@@ -96,7 +98,7 @@ async fn test_create_token_account() {
     let instruction2 = solana_program::instruction::Instruction::new_with_borsh(
         program_id,
         &Instruction::CreateTokenAccount(InsCreateTokenAccount {
-            airdrop: 123
+            airdrop: 123,
         }),
         vec![
             AccountMeta::new(payer.pubkey(), true),
@@ -119,4 +121,80 @@ async fn test_create_token_account() {
         banks_client.process_transaction(transaction).await;
 
     assert!(transaction_result.is_ok());
+}
+
+#[tokio::test]
+async fn test_air_drop() {
+    let program_id = Pubkey::new_unique();
+    let (banks_client, payer, recent_blockhash) =
+        ProgramTest::new("Ins ", program_id, processor!(process_instruction))
+            .start()
+            .await;
+    let mint_rmb = MintRmb::pda(&program_id);
+    let token_rmb =
+        MintRmb::token_account(&program_id, &payer.pubkey(), &mint_rmb.0);
+
+    let instruction1 = solana_program::instruction::Instruction::new_with_borsh(
+        program_id,
+        &Instruction::InitMintRmb(InsInitMintRmb {}),
+        vec![
+            AccountMeta::new(payer.pubkey(), true),
+            AccountMeta::new_readonly(sysvar::rent::id(), false),
+            AccountMeta::new(mint_rmb.0, false),
+            AccountMeta::new_readonly(system_program::ID, false),
+            AccountMeta::new_readonly(spl_token::ID, false),
+        ],
+    );
+
+    let instruction2 = solana_program::instruction::Instruction::new_with_borsh(
+        program_id,
+        &Instruction::CreateTokenAccount(InsCreateTokenAccount {
+            airdrop: 123,
+        }),
+        vec![
+            AccountMeta::new(payer.pubkey(), true),
+            AccountMeta::new_readonly(mint_rmb.0, false),
+            AccountMeta::new_readonly(payer.pubkey(), false),
+            AccountMeta::new(token_rmb.0, false),
+            AccountMeta::new_readonly(system_program::ID, false),
+            AccountMeta::new_readonly(spl_token::ID, false),
+            AccountMeta::new_readonly(spl_associated_token_account::ID, false),
+        ],
+    );
+
+    let instruction3 = solana_program::instruction::Instruction::new_with_borsh(
+        program_id,
+        &Instruction::AirDrop(InsAirDrop { airdrop: 12345 }),
+        vec![
+            AccountMeta::new(payer.pubkey(), true),
+            AccountMeta::new_readonly(mint_rmb.0, false),
+            AccountMeta::new_readonly(payer.pubkey(), false),
+            AccountMeta::new(token_rmb.0, false),
+            // AccountMeta::new_readonly(system_program::ID, false),
+            AccountMeta::new_readonly(spl_token::ID, false),
+            // AccountMeta::new_readonly(spl_associated_token_account::ID, false),
+        ],
+    );
+
+    let mut transaction = Transaction::new_with_payer(
+        &[instruction1, instruction2, instruction3],
+        Some(&payer.pubkey()),
+    );
+    transaction.sign(&[&payer], recent_blockhash);
+
+    let transaction_result =
+        banks_client.process_transaction(transaction).await;
+
+    assert!(transaction_result.is_ok());
+
+    // banks_client.get_account_data_with_borsh(token_rmb.0).await.unwrap();
+    let token_rmb_account = banks_client
+        .get_account(token_rmb.0)
+        .await
+        .unwrap()
+        .unwrap();
+    let data =
+        spl_token::state::Account::unpack(&token_rmb_account.data).unwrap();
+    msg!("{:#?}", data);
+    assert!(data.amount == 12468);
 }

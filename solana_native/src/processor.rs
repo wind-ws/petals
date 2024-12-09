@@ -23,6 +23,10 @@ impl Processor {
                 msg!("Ins: InitMintRmb");
                 ins_init_mint_rmb(program_id, accounts, args)
             }
+            Instruction::CreateTokenAccount(args)=>{
+                msg!("Ins: CreateTokenAccount");
+                ins_create_token_account(program_id,accounts,args)
+            }
             Instruction::None => {
                 msg!("none!!!");
                 Ok(())

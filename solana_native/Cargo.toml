@@ -16,7 +16,9 @@ solana-sdk = "2.1.4"
 solana-program-test = "2.1.4"
 
 spl-token = { version = "7.0.0", features = ["no-entrypoint"] }
+spl-associated-token-account =  { version = "6.0.0", features = [ "no-entrypoint" ] }
 # spl_token_2022 = "6.0.0"
+
 
 tokio = "1.42.0"
 

@@ -13,6 +13,8 @@ impl MintRmb {
     /// get associated token account pda
     ///
     /// require: mint_rmb_key == MintRmbPda::pda(...).0
+    /// 
+    /// todo : remove the program_id 
     pub fn token_account(
         program_id: &Pubkey,
         owner: &Pubkey,

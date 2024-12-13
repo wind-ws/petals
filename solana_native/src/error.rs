@@ -11,10 +11,14 @@ pub enum MyError {
     /// mint_rmb 以被创建
     #[error("Mint Account Exist")]
     MintRmbExist,
+    #[error("Mint Account Non-Exist")]
+    MintRmbNonExist,
     #[error("Token Account Exist")]
     TokenRmbExist,
     #[error("Token Account Non-Exist")]
     TokenRmbNonExist,
+    #[error("UserInfo Account Exist")]
+    UserInfoExist
 }
 
 impl From<MyError> for ProgramError {

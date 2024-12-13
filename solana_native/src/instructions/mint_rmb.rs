@@ -1,19 +1,15 @@
-use std::{cell::RefCell, rc::Rc};
-
 use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
     msg,
     program::{invoke, invoke_signed},
-    program_error::ProgramError,
     program_pack::Pack,
     pubkey::Pubkey,
     rent::Rent,
     system_instruction, system_program,
     sysvar::Sysvar,
 };
-use solana_sdk::program_error::PrintProgramError;
 use spl_token::{instruction, state::Mint};
 
 use crate::{error::MyError, state::mint_rmb::MintRmb};
@@ -108,12 +104,15 @@ pub fn ins_create_token_account(
     let token_program = next_account_info(accounts_iter)?;
     let associated_token_program = next_account_info(accounts_iter)?;
 
+    if mint_rmb_account.lamports() == 0 {
+        return Err(MyError::MintRmbNonExist.into());
+    }
     if token_rmb_account.lamports() != 0 {
         return Err(MyError::TokenRmbExist.into());
     }
 
     let (mint_rmb, bump) = MintRmb::pda(program_id);
-    let (token_rmb, token_bump) =
+    let (token_rmb, _token_bump) =
         MintRmb::token_account(program_id, owner_rmb_account.key, &mint_rmb);
     assert!(&mint_rmb.eq(mint_rmb_account.key));
     assert!(&token_rmb.eq(token_rmb_account.key));
@@ -189,21 +188,18 @@ pub fn ins_air_drop(
     let mint_rmb_account = next_account_info(accounts_iter)?;
     let owner_rmb_account = next_account_info(accounts_iter)?;
     let token_rmb_account = next_account_info(accounts_iter)?;
-    // let system_program = next_account_info(accounts_iter)?;
     let token_program = next_account_info(accounts_iter)?;
-    // let associated_token_program = next_account_info(accounts_iter)?;
 
     let (mint_rmb, bump) = MintRmb::pda(program_id);
-    let (token_rmb, token_bump) =
+    let (token_rmb, _token_bump) =
         MintRmb::token_account(program_id, owner_rmb_account.key, &mint_rmb);
     assert!(&mint_rmb.eq(mint_rmb_account.key));
     assert!(&token_rmb.eq(token_rmb_account.key));
-    // assert!(system_program::check_id(system_program.key));
     assert!(spl_token::check_id(token_program.key));
-    // assert!(spl_associated_token_account::check_id(
-    //     associated_token_program.key
-    // ));
 
+    if mint_rmb_account.lamports() == 0 {
+        return Err(MyError::MintRmbNonExist.into());
+    }
     if token_rmb_account.lamports() == 0 {
         return Err(MyError::TokenRmbNonExist.into());
     }
@@ -235,4 +231,8 @@ pub fn ins_air_drop(
     msg!("Tokens minted to wallet successfully.");
 
     Ok(())
+}
+
+pub fn tranfer(from:&Pubkey,to:Pubkey,amount:u64){
+
 }

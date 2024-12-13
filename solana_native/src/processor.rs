@@ -1,7 +1,7 @@
-use borsh::{BorshDeserialize, BorshSerialize};
+use borsh::BorshDeserialize;
 use solana_program::{
     account_info::AccountInfo,
-    entrypoint::{self, ProgramResult},
+    entrypoint::ProgramResult,
     msg,
     program_error::ProgramError,
     pubkey::Pubkey,
@@ -23,16 +23,16 @@ impl Processor {
                 msg!("Ins: InitMintRmb");
                 ins_init_mint_rmb(program_id, accounts, args)
             }
-            Instruction::CreateTokenAccount(args)=>{
+            Instruction::CreateTokenAccount(args) => {
                 msg!("Ins: CreateTokenAccount");
-                ins_create_token_account(program_id,accounts,args)
+                ins_create_token_account(program_id, accounts, args)
             }
-            Instruction::AirDrop(args)=>{
+            Instruction::AirDrop(args) => {
                 msg!("Ins: AirDrop");
                 ins_air_drop(program_id, accounts, args)
             }
             Instruction::None => {
-                msg!("none!!!");
+                msg!("Ins: none!!!");
                 Ok(())
             }
             _ => {

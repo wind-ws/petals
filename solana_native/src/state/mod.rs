@@ -2,4 +2,4 @@
 /// 软妹币 模块
 pub mod mint_rmb;
 
-pub mod user_pda;
+pub mod raise_fund;

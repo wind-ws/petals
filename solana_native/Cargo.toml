@@ -11,8 +11,8 @@ crate-type = ["cdylib", "rlib"]
 no-entrypoint = []
 
 [dependencies]
-solana-program = { version = "2.1.4", feature = "borsh" }
-solana-sdk = "2.1.4"
+solana-program = { version = "2.1.6", feature = "borsh" }
+solana-sdk = "2.1.6"
 
 spl-token = { version = "7.0.0", features = ["no-entrypoint"] }
 spl-associated-token-account =  { version = "6.0.0", features = [ "no-entrypoint" ] }
@@ -28,5 +28,5 @@ num-traits = "0.2.19"
 num_enum = "0.7.3"
 
 [dev-dependencies]
-solana-program-test = "2.1.4"
+solana-program-test = "2.1.6"
 

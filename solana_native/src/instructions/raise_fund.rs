@@ -15,8 +15,6 @@ use crate::{
     state::{mint_rmb::MintRmb, raise_fund::*},
 };
 
-
-
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct InsCreateUserInfo {
     /// 真实姓名(需要被募捐的)
@@ -62,15 +60,17 @@ pub fn ins_create_user_info(
     }
     msg!("user-info: {}", user_info_account.key);
     msg!("Creating user-info account ...");
-    let rent = (Rent::get()?).minimum_balance(UserInfo::INIT_SPACE as usize);
+    let data = UserInfo::new(BaseInfo::new(args.name, args.phone, args.id));
+    let data = borsh::to_vec(&data).unwrap();
+    let rent = (Rent::get()?).minimum_balance(data.len());
     // msg!("rent:{}",rent);
     invoke_signed(
         &system_instruction::create_account(
             payer_account.key,
             user_info_account.key,
             rent,
-            UserInfo::INIT_SPACE,
-            system_program.key,
+            data.len() as u64,
+            program_id,
         ),
         &[payer_account.clone(), user_info_account.clone()],
         &[&[
@@ -80,14 +80,9 @@ pub fn ins_create_user_info(
         ]],
     )?;
     msg!("user-info account created successfully");
-    msg!("{:#?}", user_info_account);
 
-    let data = UserInfo::new(BaseInfo::new(args.name, args.phone, args.id));
-    data.serialize(&mut &mut user_info_account.data.borrow_mut()[..])?;
-
-    msg!("{:#?}", user_info_account);
-    // todo!("bug: 修改data似乎是失败的,可是example中也是这样,可能是test中的bank_client有问题");
-
+    user_info_account.try_borrow_mut_data().unwrap()[..data.len()]
+        .copy_from_slice(data.as_ref());
     msg!("init user-info account data successfully");
 
     Ok(())

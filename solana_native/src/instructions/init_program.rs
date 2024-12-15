@@ -142,7 +142,7 @@ struct InitRaiseFundList {}
 
 /// 初始化 raise_fund_list
 fn init_raise_fund_list(
-    _program_id: &Pubkey,
+    program_id: &Pubkey,
     accounts: &[AccountInfo],
     _args: InitRaiseFundList,
     raise_fund_list_bump: u8,
@@ -153,28 +153,28 @@ fn init_raise_fund_list(
     let _mint_account = next_account_info(accounts_iter)?;
     let raise_fund_list_account = next_account_info(accounts_iter)?;
     let _rent_account = next_account_info(accounts_iter)?;
-    let system_program = next_account_info(accounts_iter)?;
+    let _system_program = next_account_info(accounts_iter)?;
     let _token_program = next_account_info(accounts_iter)?;
 
     msg!("RaiseFundList: {}", raise_fund_list_account.key);
     msg!("Creating raise_fund_list account ...");
-    let rent = (Rent::get()?).minimum_balance(RaiseFundList::INIT_SPACE);
+    let data = borsh::to_vec(&RaiseFundList::new()).unwrap();
+    let rent = (Rent::get()?).minimum_balance(data.len());
     invoke_signed(
         &system_instruction::create_account(
             payer_account.key,
             raise_fund_list_account.key,
             rent,
-            RaiseFundList::INIT_SPACE as u64,
-            system_program.key,
+            data.len() as u64,
+            program_id,
         ),
         &[payer_account.clone(), raise_fund_list_account.clone()],
         &[&[&RaiseFundList::seed(0), &[raise_fund_list_bump]]],
     )?;
     msg!("raise_fund_list created successfully");
 
-    let data = borsh::to_vec(&RaiseFundList::new()).unwrap();
-    data.serialize(&mut *raise_fund_list_account.data.borrow_mut()).unwrap();
-    
+    raise_fund_list_account.try_borrow_mut_data().unwrap()[..data.len()]
+        .copy_from_slice(data.as_ref());
 
     Ok(())
 }

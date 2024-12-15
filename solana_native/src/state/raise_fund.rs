@@ -76,7 +76,6 @@ impl RaiseFundList {
     // }
     // pub fn remove(&mut self, id: u8, index: u32) {}
 
-    pub const INIT_SPACE: usize = 50;
     pub fn space() -> usize {
         todo!()
     }
@@ -163,8 +162,7 @@ pub struct UserInfo {
     payer: HashMap<Pubkey, u64>,
 }
 impl UserInfo {
-    /// todo :
-    pub const INIT_SPACE: u64 = 99;
+    // pub const INIT_SPACE: u64 = 99;
     /// seed = "user_info"+token_rmb
     pub fn pda(program_id: &Pubkey, token_rmb: &Pubkey) -> (Pubkey, u8) {
         Pubkey::find_program_address(
@@ -184,6 +182,7 @@ impl UserInfo {
         todo!()
     }
 }
+
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct BaseInfo {
     /// 真实姓名(需要被募捐的)

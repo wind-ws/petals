@@ -271,19 +271,17 @@ async fn test_create_user_info() {
         banks_client.process_transaction(transaction).await;
     assert!(transaction_result.is_ok());
 
-    // let user_info_account = banks_client
-    //     .get_account(
-    //         user_info.0,
-    //     )
-    //     .await
-    //     .unwrap()
-    //     .unwrap();
-    banks_client.get_account_data_with_borsh::<UserInfo>(user_info.0).await.unwrap();
-    // let data = banks_client.get_account_data_with_borsh::<UserInfo>(user_info.0).await.unwrap();
-
-    // msg!("{:?}", user_info_account.data);
-    // msg!("{:#?}",data);
-    // let data = borsh::from_slice::<UserInfo>(user_info_account.data.as_slice())
-    //     .unwrap();
-    // msg!("{:#?}", data);
+    let user_info_account = banks_client
+        .get_account_with_commitment(
+            user_info.0,
+            solana_sdk::commitment_config::CommitmentLevel::Finalized,
+        )
+        .await
+        .unwrap()
+        .unwrap();
+    msg!("{:?}", user_info_account.data);
+    msg!(
+        "{:#?}",
+        borsh::from_slice::<UserInfo>(user_info_account.data.as_ref()).unwrap()
+    )
 }

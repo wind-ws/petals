@@ -7,25 +7,27 @@ pub enum Instruction {
     /// 空指令(无意义指令)
     None,
     /// 初始化程序,仅执行一次,且在程序部署后立马执行
-    InitProgram(),
+    ///
+    /// # init task
+    /// * mint_rmb mint account init
+    /// * raise_fund_list pda account init
+    ///
+    /// # accounts
+    /// .`[signer,writable]` payer_account \
+    /// .`[writable]` mint_rmb_account \
+    /// .`[writable]` raise_fund_list_account \
+    /// .`[]` rent \
+    /// .`[]` system_program \
+    /// .`[]` token_program \
+    InitProgram(InsInitProgram),
     /// 发布募捐
     PublishRaiseFund,
     /// 实名捐助
     RealNameDonation,
     /// 匿名捐助
     AnonymousDonation,
-    /// 初始化mint_rmb
-    ///
-    /// note: 这个指令应该在部署程序后立马执行,且只执行一次
-    ///
-    /// # accounts
-    ///
-    /// .`[signer,writable]` payer_account \
-    /// .`[]` rent \
-    /// .`[writable]` mint_rmb_account \
-    /// .`[]` system_program \
-    /// .`[]` token_program \
-    InitMintRmb(InsInitMintRmb),
+    // #[deprecated(note = "Use `InitProgram` instead")]
+    // InitMintRmb(),
     /// 创建一个 associated token account pda  with mint_rmb
     ///
     /// # accounts

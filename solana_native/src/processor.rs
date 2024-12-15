@@ -19,9 +19,9 @@ impl Processor {
         let ins = Instruction::try_from_slice(input)?;
 
         match ins {
-            Instruction::InitMintRmb(args) => {
-                msg!("Ins: InitMintRmb");
-                ins_init_mint_rmb(program_id, accounts, args)
+            Instruction::InitProgram(args) =>{
+                msg!("Ins: InitProgram");
+                ins_init_program(program_id, accounts, args)
             }
             Instruction::CreateTokenAccount(args) => {
                 msg!("Ins: CreateTokenAccount");
@@ -30,6 +30,10 @@ impl Processor {
             Instruction::AirDrop(args) => {
                 msg!("Ins: AirDrop");
                 ins_air_drop(program_id, accounts, args)
+            }
+            Instruction::CreateUserInfo(args)=>{
+                msg!("Ins: CreateUserInfo");
+                ins_create_user_info(program_id, accounts, args)
             }
             Instruction::None => {
                 msg!("Ins: none!!!");

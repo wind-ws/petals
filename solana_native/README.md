@@ -8,3 +8,6 @@ Mint Account 命名 mint_mintname 开头 , Token Account 命名 token_mintname �
 例如 mint_rmb, token_rmb , owner_rmb
 
 todo
+
+# 当前程序问题
+有许多优化没做,懒得去做,有时间再做吧

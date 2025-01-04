@@ -258,7 +258,6 @@ async fn test_create_user_info() {
             AccountMeta::new_readonly(payer.pubkey(), false),
             AccountMeta::new_readonly(token_rmb.0, false),
             AccountMeta::new(user_info.0, false),
-            AccountMeta::new_readonly(system_program::ID, false),
         ],
     );
 

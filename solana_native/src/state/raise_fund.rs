@@ -7,6 +7,8 @@ use std::{
 use borsh::{BorshDeserialize, BorshSerialize};
 use solana_sdk::pubkey::Pubkey;
 
+use super::mint_rmb::TokenRmbPubkey;
+
 /// PDA(init)
 ///
 /// 存储上限是 10MB(10485760 Byte)
@@ -29,7 +31,7 @@ pub struct RaiseFundList {
     /// 初始空间分配为 4 ,每次增长为*2
     /// 增长到 262144 后 下次增长为291270
     /// 291270 后,元素添加进入 next
-    list: Vec<Pubkey>,
+    list: Vec<RaiseFundPubkey>,
     // /// 记录 list 中被移除的 index ,而非调整vec大小(重排序,重分配)
     // /// 也确保被分配的索引不变
     // _a: Vec<u32>,
@@ -37,7 +39,8 @@ pub struct RaiseFundList {
     // /// 若空间不够,需要继续扩展
     // pub next: Option<Pubkey>,
 }
-
+/// 意义化Pubkey
+pub type RaiseFundListPubkey = Pubkey;
 impl RaiseFundList {
     // pub fn new(id: u8) -> Self {
     //     Self {
@@ -91,60 +94,73 @@ impl RaiseFundList {
         seed
     }
     pub fn pda_id(program_id: &Pubkey, id: u8) -> (Pubkey, u8) {
-        Pubkey::find_program_address(&[&RaiseFundList::seed(id)], program_id)
+        Pubkey::find_program_address(
+            &[&RaiseFundList::seed(id)],
+            program_id,
+        )
     }
     /// id = 0
     /// 仍保留id,未来方便扩展
     pub fn pda(program_id: &Pubkey) -> (Pubkey, u8) {
-        Pubkey::find_program_address(&[&RaiseFundList::seed(0)], program_id)
+        Pubkey::find_program_address(
+            &[&RaiseFundList::seed(0)],
+            program_id,
+        )
+    }
+    pub fn add(&mut self,raise_fund:RaiseFundPubkey){
+        self.list.push(raise_fund);
     }
 }
 
 /// PDA
 /// 募捐用户pda的实际存储类型
+#[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct RaiseFund {
-    info: RaiseFundInfo,
+    pub info: RaiseFundInfo,
     /// 需要的捐款数量
-    require_amount: u64,
+    pub require_amount: u64,
     /// 以捐款的数量
-    amount: u64,
+    pub amount: u64,
     /// 以被取走的捐款数量
-    take_amount: u64,
+    // take_amount: u64,
 
     /// 收款方 token_rmb_pubkey
-    payee: Pubkey,
+    pub payee: TokenRmbPubkey,
 
     /// ture:是运行状态(true:可被捐款)
-    is_run: bool,
+    /// 若捐款完毕,is_run必为false,直到 重新发布募捐
+    pub is_run: bool,
 }
+/// 意义化Pubkey
+pub type RaiseFundPubkey = Pubkey;
 impl RaiseFund {
-    /// seed = "raise_fund"+[RealName]+[IDNumber]+[payee PubKey]
+    pub fn seed(payee: &TokenRmbPubkey) ->[u8;42]{
+        const SEED: &[u8; 10] = b"raise_fund"; 
+        let mut seed = [0u8; 42];
+        seed[..10].copy_from_slice(SEED);
+        seed[10..43].copy_from_slice(&payee.to_bytes());
+        seed
+    }
+    /// seed = "raise_fund"+[payee PubKey]
     pub fn pda(
         program_id: &Pubkey,
-        real_name: &String,
-        id: &String,
-        payee: &Pubkey,
-    ) {
+        payee: &TokenRmbPubkey,
+    ) -> (RaiseFundPubkey, u8) {
         Pubkey::find_program_address(
-            &[
-                b"raise_fund",
-                real_name.as_bytes(),
-                id.as_bytes(),
-                &payee.to_bytes(),
-            ],
+            &[&RaiseFund::seed(payee)],
             program_id,
-        );
+        )
     }
     pub fn new(
         info: RaiseFundInfo,
         require_amount: u64,
-        payee: Pubkey,
+        payee: TokenRmbPubkey,
     ) -> Self {
         Self {
             info,
             require_amount,
             amount: 0,
-            take_amount: 0,
+            // take_amount: 0,
             payee,
             // payer:HashSet::new(1),
             is_run: true,
@@ -159,12 +175,17 @@ pub struct UserInfo {
     /// 初始化后不可修改
     base_info: BaseInfo,
     /// <捐助方(token_rmb),数量>
-    payer: HashMap<Pubkey, u64>,
+    payer: HashMap<TokenRmbPubkey, u64>,
 }
+/// 意义化Pubkey
+pub type UserInfoPubkey = Pubkey;
 impl UserInfo {
     // pub const INIT_SPACE: u64 = 99;
     /// seed = "user_info"+token_rmb
-    pub fn pda(program_id: &Pubkey, token_rmb: &Pubkey) -> (Pubkey, u8) {
+    pub fn pda(
+        program_id: &Pubkey,
+        token_rmb: &TokenRmbPubkey,
+    ) -> (Pubkey, u8) {
         Pubkey::find_program_address(
             &[b"user_info", &token_rmb.to_bytes()],
             program_id,

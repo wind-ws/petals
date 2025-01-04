@@ -21,11 +21,19 @@ pub enum Instruction {
     /// .`[]` token_program \
     InitProgram(InsInitProgram),
     /// 发布募捐
-    PublishRaiseFund,
-    /// 实名捐助
-    RealNameDonation,
-    /// 匿名捐助
-    AnonymousDonation,
+    /// 
+    /// # accounts
+    /// .`[signer,writable]` payer_account \
+    /// 
+    PublishRaiseFund(InsPublishRaiseFund),
+    /// 捐助
+    /// 
+    /// # accounts
+    /// 
+    /// 
+    Donation(InsDonation),
+
+    // ViewInfo(),
     // #[deprecated(note = "Use `InitProgram` instead")]
     // InitMintRmb(),
     /// 创建一个 associated token account pda  with mint_rmb
@@ -48,5 +56,23 @@ pub enum Instruction {
     /// .`[writable]` token_rmb_account \
     /// .`[]` token_program \
     AirDrop(InsAirDrop),
+    /// 为指定token_rmb_account 创建 一个user_info,用于存储用户信息数据
+    ///
+    /// # accounts
+    /// .`[signer,writable]` payer_account \
+    /// .`[]` mint_rmb_account \
+    /// .`[]` owner_rmb_account \
+    /// .`[]` token_rmb_account \
+    /// .`[writable]` user_info_account \
+    ///
     CreateUserInfo(InsCreateUserInfo),
+    /// 注销所有数据和账号,且回收sol
+    /// 
+    /// # accounts
+    /// 
+    /// # note
+    /// - 当 token_rmb amount 不为零时,指令执行失败
+    /// - 当 还存在募捐在运行状态时, 指令执行失败
+    /// 
+    LogoutRecycling()
 }

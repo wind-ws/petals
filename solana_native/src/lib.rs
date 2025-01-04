@@ -5,6 +5,7 @@ mod instructions;
 mod state;
 mod error;
 mod instruction;
+mod accounts;
 
 #[cfg(test)]
 mod tests;

@@ -18,7 +18,9 @@ pub enum MyError {
     #[error("Token Account Non-Exist")]
     TokenRmbNonExist,
     #[error("UserInfo Account Exist")]
-    UserInfoExist
+    UserInfoExist,
+    #[error("暂时没想好,写啥异常好")]
+    Todo,
 }
 
 impl From<MyError> for ProgramError {

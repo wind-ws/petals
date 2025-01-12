@@ -107,8 +107,14 @@ impl RaiseFundList {
             program_id,
         )
     }
-    pub fn add(&mut self,raise_fund:RaiseFundPubkey){
+    pub fn add(&mut self, raise_fund: RaiseFundPubkey) {
         self.list.push(raise_fund);
+    }
+    pub fn get(&self, index: usize) -> RaiseFundPubkey {
+        self.list[index]
+    }
+    pub fn remove(&mut self,index: usize){
+        self.list.remove(index);
     }
 }
 
@@ -134,8 +140,8 @@ pub struct RaiseFund {
 /// 意义化Pubkey
 pub type RaiseFundPubkey = Pubkey;
 impl RaiseFund {
-    pub fn seed(payee: &TokenRmbPubkey) ->[u8;42]{
-        const SEED: &[u8; 10] = b"raise_fund"; 
+    pub fn seed(payee: &TokenRmbPubkey) -> [u8; 42] {
+        const SEED: &[u8; 10] = b"raise_fund";
         let mut seed = [0u8; 42];
         seed[..10].copy_from_slice(SEED);
         seed[10..43].copy_from_slice(&payee.to_bytes());
@@ -175,7 +181,7 @@ pub struct UserInfo {
     /// 初始化后不可修改
     base_info: BaseInfo,
     /// <捐助方(token_rmb),数量>
-    payer: HashMap<TokenRmbPubkey, u64>,
+    donor: HashMap<TokenRmbPubkey, u64>,
 }
 /// 意义化Pubkey
 pub type UserInfoPubkey = Pubkey;
@@ -194,13 +200,24 @@ impl UserInfo {
     pub fn new(base_info: BaseInfo) -> Self {
         Self {
             base_info,
-            payer: HashMap::new(),
+            donor: HashMap::new(),
         }
     }
     /// 需要的空间大小 (单位字节)
     pub fn space(&self) -> u64 {
         let space = 0;
         todo!()
+    }
+
+    pub fn add_donor_info(
+        &mut self,
+        donor: TokenRmbPubkey,
+        amount: u64,
+    ) {
+        self.donor
+            .entry(donor)
+            .and_modify(|v| *v += amount)
+            .or_insert(amount);
     }
 }
 

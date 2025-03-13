@@ -2,6 +2,8 @@ use borsh::{BorshDeserialize, BorshSerialize};
 
 use crate::instructions::*;
 
+
+/// todo : 给所有 指令 添加 signer,writable 验证
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub enum Instruction {
     /// 空指令(无意义指令)
@@ -24,12 +26,26 @@ pub enum Instruction {
     /// 
     /// # accounts
     /// .`[signer,writable]` payer_account \
+    /// .`[]` mint_rmb_account \
+    /// .`[signer]` owner_rmb_account \
+    /// .`[]` token_rmb_account \
+    /// .`[]` user_info_account \
+    /// .`[]` raise_fund_account \
+    /// .`[]` raise_fund_list_account \
     /// 
     PublishRaiseFund(InsPublishRaiseFund),
     /// 捐助
     /// 
     /// # accounts
-    /// 
+    /// .`[signer,writable]` payer_account \
+    /// .`[]` mint_rmb_account \
+    /// .`[signer]` owner_rmb_donor_account \
+    /// .`[writable]` token_rmb_donor_account \
+    /// .`[]` owner_rmb_donee_account \
+    /// .`[writable]` token_rmb_donee_account \
+    /// .`[]` user_info_donee_account \
+    /// .`[]` raise_fund_account \
+    /// .`[]` raise_fund_list_account \
     /// 
     Donation(InsDonation),
 
@@ -61,7 +77,7 @@ pub enum Instruction {
     /// # accounts
     /// .`[signer,writable]` payer_account \
     /// .`[]` mint_rmb_account \
-    /// .`[]` owner_rmb_account \
+    /// .`[signer]` owner_rmb_account \
     /// .`[]` token_rmb_account \
     /// .`[writable]` user_info_account \
     ///

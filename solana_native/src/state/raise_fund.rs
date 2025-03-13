@@ -140,20 +140,15 @@ pub struct RaiseFund {
 /// 意义化Pubkey
 pub type RaiseFundPubkey = Pubkey;
 impl RaiseFund {
-    pub fn seed(payee: &TokenRmbPubkey) -> [u8; 42] {
-        const SEED: &[u8; 10] = b"raise_fund";
-        let mut seed = [0u8; 42];
-        seed[..10].copy_from_slice(SEED);
-        seed[10..43].copy_from_slice(&payee.to_bytes());
-        seed
-    }
+    pub const SEED: &[u8; 10] = b"raise_fund";
+
     /// seed = "raise_fund"+[payee PubKey]
     pub fn pda(
         program_id: &Pubkey,
-        payee: &TokenRmbPubkey,
+        donee: &TokenRmbPubkey,
     ) -> (RaiseFundPubkey, u8) {
         Pubkey::find_program_address(
-            &[&RaiseFund::seed(payee)],
+            &[RaiseFund::SEED,&donee.to_bytes()],
             program_id,
         )
     }
@@ -187,13 +182,15 @@ pub struct UserInfo {
 pub type UserInfoPubkey = Pubkey;
 impl UserInfo {
     // pub const INIT_SPACE: u64 = 99;
+    pub const SEED: &[u8; 9] = b"user_info";
+
     /// seed = "user_info"+token_rmb
     pub fn pda(
         program_id: &Pubkey,
         token_rmb: &TokenRmbPubkey,
     ) -> (Pubkey, u8) {
         Pubkey::find_program_address(
-            &[b"user_info", &token_rmb.to_bytes()],
+            &[UserInfo::SEED,&token_rmb.to_bytes()],
             program_id,
         )
     }
@@ -270,11 +267,13 @@ impl PhoneNumber {
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct RaiseFundInfo {
     /// 标题
-    title: String,
+    pub title: String,
     /// 简介
-    brief: String,
+    pub brief: String,
     /// 图片URL来源, 多张
-    picture_url: Option<String>,
+    pub picture_url: Option<String>,
     /// URL来源的多张图片的 hash
-    picture_hash: Option<()>,
+    pub picture_hash: Option<()>,
 }
+
+

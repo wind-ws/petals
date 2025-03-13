@@ -35,6 +35,14 @@ impl Processor {
                 msg!("Ins: CreateUserInfo");
                 ins_create_user_info(program_id, accounts, args)
             }
+            Instruction::PublishRaiseFund(args)=>{
+                msg!("Ins: PublishRaiseFund");
+                ins_publish_raise_fund(program_id, accounts, args)
+            }
+            Instruction::Donation(args)=>{
+                msg!("Ins: Donation");
+                ins_donation(program_id, accounts, args)
+            }
             Instruction::None => {
                 msg!("Ins: none!!!");
                 Ok(())

@@ -2,9 +2,10 @@ import { defineConfig } from "vite";
 import solidPlugin from "vite-plugin-solid";
 import * as fs from "node:fs";
 import { Keypair } from "@solana/web3.js";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-   plugins: [solidPlugin()],
+   plugins: [tailwindcss(),solidPlugin()],
    server: {
       port: 3000,
    },

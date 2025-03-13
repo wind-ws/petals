@@ -18,7 +18,7 @@ use crate::{error::MyError, state::mint_rmb::MintRmb};
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct InsCreateTokenAccount {
     /// 给予一定的初始coin
-    pub airdrop: u8,
+    pub airdrop: u32,
 }
 
 /// for [`Instruction::CreateTokenAccount`]
@@ -58,8 +58,9 @@ pub fn ins_create_token_account(
     msg!("Creating associated token account... :{}", &token_rmb);
     invoke(
         &spl_associated_token_account::instruction::create_associated_token_account(
+            // bug: 按道理来说, funding和wallet 应该要存在一个owner才对
             payer_account.key,
-            payer_account.key,
+            owner_rmb_account.key,
             mint_rmb_account.key,
             token_program.key
         ),

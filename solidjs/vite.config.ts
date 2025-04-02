@@ -3,9 +3,15 @@ import solidPlugin from "vite-plugin-solid";
 import * as fs from "node:fs";
 import { Keypair } from "@solana/web3.js";
 import tailwindcss from "@tailwindcss/vite";
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 
 export default defineConfig({
-   plugins: [tailwindcss(),solidPlugin()],
+   plugins: [
+       tailwindcss(),
+      solidPlugin(),
+      NodeGlobalsPolyfillPlugin({
+         buffer: true, // 启用 Buffer polyfill
+   })],
    server: {
       port: 3000,
    },

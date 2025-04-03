@@ -89,7 +89,11 @@ export default function Root(props) {
                   <input type="text" placeholder="输入你的私钥" ref={inputRef}  class="input"/>
                   <button  class="btn" on:click={()=>{
                      console.log(inputRef.value);
-                     const privateKeyBytes = bs58.decode(inputRef.value);
+                     // const privateKeyBytes = bs58.decode("["+inputRef.value+"]");
+                     const numbers = inputRef.value.split(',')
+                         .map(num => Number(num));
+                     const privateKeyBytes =  Uint8Array.from(numbers);
+                     console.log(privateKeyBytes);
                      const keypair = Keypair.fromSecretKey(privateKeyBytes);
                      SolanaKeyPair[1](keypair);
                   }}>Connect</button>

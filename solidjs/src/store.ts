@@ -6,6 +6,7 @@ import {createEffect, createSignal, Signal} from "solid-js";
 import {createStore, produce} from "solid-js/store";
 import {SetStoreFunction, Store} from "solid-js/store/types/store";
 
+export const [trigger, setTrigger] = createSignal(0);
 let my_public_signal:[get: Store<Public>, set: SetStoreFunction<Public>] = null;
 
 const INIT = (()=>{
@@ -69,11 +70,11 @@ export function publish(pubkey:PublicKey,title:string,brief:string,){
         let tokenkey = v.myself[pubkey.toString()].token_pubkey;
         v.raise_fund_list[tokenkey.toString()] = {
             title,
-            brief
+            brief,
+
         }
     }))
 }
-export const [trigger, setTrigger] = createSignal(0);
 export type Public = {
     raise_fund_list:{
         [token_pubkey:string]: {

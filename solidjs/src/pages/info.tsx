@@ -1,6 +1,6 @@
 import {SolanaKeyPair} from "../state";
 import {my_pubkey, my_public, my_tokenkey, setTrigger, trans} from "../store";
-import {Show} from "solid-js";
+import {For, Show} from "solid-js";
 import {produce} from "solid-js/store";
 
 export default function Info() {
@@ -84,7 +84,30 @@ export default function Info() {
          </dialog>
       </div>
       <div>
-         其他 PDA 信息
+         其他 用户Token信息
+         <div class="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
+            <table class="table">
+               <thead>
+               <tr>
+                  <th>Token地址</th>
+                  <th>软妹币数量</th>
+               </tr>
+               </thead>
+               <tbody>
+               <For each={Object.entries(my_public().get.token_map)} fallback={<div>None...</div>}>
+                  {
+                     ([key,item])=>{
+                        return <tr>
+                           <td class="">{key}</td>
+                           <td class="">{item}</td>
+                        </tr>
+                     }
+                  }
+               </For>
+
+               </tbody>
+            </table>
+         </div>
       </div>
    </>;
 }

@@ -1,5 +1,5 @@
 import {SolanaKeyPair} from "../state";
-import {my_pubkey, my_public, my_tokenkey, setTrigger, trans} from "../store";
+import {my_pubkey, my_public, my_tokenkey, save, setTrigger, trans} from "../store";
 import {For, Show} from "solid-js";
 import {produce} from "solid-js/store";
 
@@ -73,8 +73,10 @@ export default function Info() {
                            id:id.value,
                            phone:phone.value
                         };
-                        setTrigger();
-                     }))
+                        
+                     }));
+                     setTrigger(1);
+                     save();
                   });
                }}>注册</button>
             </div>

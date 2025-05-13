@@ -1,5 +1,5 @@
 import {For} from "solid-js";
-import {my_public, my_tokenkey, setTrigger, trans} from "../store";
+import {my_public, my_tokenkey, save, setTrigger, trans} from "../store";
 import {toast} from "solid-toast";
 import {produce} from "solid-js/store";
 
@@ -30,7 +30,8 @@ export default function Donation() {
                         v.token_map[addr.value] += Number(amount.value);
                         v.token_map[my_tokenkey()] -=Number(amount.value);
                     }))
-                    setTrigger();
+                    setTrigger(5);
+                    save();
                 })
             }}>发起捐助
             </button>

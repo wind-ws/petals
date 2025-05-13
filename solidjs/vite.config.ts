@@ -19,15 +19,15 @@ export default defineConfig({
       target: "esnext",
    },
    define: {
-      SolanaNativePubkey: Keypair.fromSecretKey(
-         Buffer.from(
-            JSON.parse(
-               fs.readFileSync(
-                  "../solana_native/target/deploy/petals_solana_native-keypair.json",
-                  "utf-8"
-               )
-            )
-         )
-      ).publicKey,
+      // SolanaNativePubkey: Keypair.fromSecretKey(
+      //    Buffer.from(
+      //       JSON.parse(
+      //          fs.readFileSync(
+      //             "../solana_native/target/deploy/petals_solana_native-keypair.json",
+      //             "utf-8"
+      //          )
+      //       )
+      //    )
+      // ).publicKey,
    },
 });
